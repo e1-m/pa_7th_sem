@@ -15,8 +15,7 @@ fun main(args: Array<String>) {
 @Component
 class ArrayMaxRunner : CommandLineRunner {
     override fun run(vararg args: String?) {
-        println("Enter numbers separated by dots:")
-
+        println("Enter numbers separated by spaces:")
         val input = readlnOrNull() ?: ""
         val numbers = input.split(" ")
             .mapNotNull { it.toIntOrNull() }
