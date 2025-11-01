@@ -1,0 +1,105 @@
+from datetime import datetime, UTC
+from typing import Optional
+
+from sqlalchemy import Integer, String, TIMESTAMP, ForeignKey, Boolean
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, declared_attr
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
+
+from src.config import rules
+from src.custom_types import OrderStatus
+from src.db.db import Base
+from src.schemas.item import Item
+
+
+class User(Base):
+    __tablename__ = 'users'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(unique=True)
+    password: Mapped[Optional[str]] = mapped_column(String(rules.MAX_HASHED_PASSWORD_LENGTH), nullable=True)
+    name: Mapped[str] = mapped_column(String(rules.MAX_USERNAME_LENGTH))
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False),
+                                                 default=lambda: datetime.now(UTC).replace(tzinfo=None))
+
+
+class TokenBase(Base):
+    __abstract__ = True
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    token: Mapped[str] = mapped_column(String)
+
+
+class RefreshToken(TokenBase):
+    __tablename__ = 'refresh_tokens'
+
+
+class RecoveryToken(TokenBase):
+    __tablename__ = 'recovery_tokens'
+
+
+class ItemBase(Base):
+    __abstract__ = True
+    product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), primary_key=True)
+    quantity: Mapped[int] = mapped_column(default=1)
+
+    @declared_attr
+    def product(cls) -> Mapped["Product"]:
+        return relationship('Product', lazy="selectin", uselist=False)
+
+
+class CartItem(ItemBase):
+    __tablename__ = 'cart_items'
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+
+    @hybrid_property
+    def total_price(self):
+        return self.product.final_price * self.quantity
+
+
+class OrderItem(ItemBase):
+    __tablename__ = 'order_items'
+    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id', ondelete='CASCADE'), primary_key=True)
+    total_price: Mapped[int]
+
+
+class Order(Base):
+    __tablename__ = 'orders'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    status: Mapped[OrderStatus] = mapped_column(default=OrderStatus.PENDING)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    is_paid: Mapped[bool] = mapped_column(default=False)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False),
+                                                 default=lambda: datetime.now(UTC).replace(tzinfo=None))
+
+    items: Mapped[list["OrderItem"]] = relationship('OrderItem', lazy='selectin', cascade="all, delete-orphan")
+
+    @hybrid_property
+    def total_price(self):
+        return sum(item.total_price for item in self.items)
+
+    def __init__(self, user_id: int, items: list[Item]):
+        super().__init__()
+        self.user_id = user_id
+        self.items = [OrderItem(**item.model_dump()) for item in items]
+
+
+class Product(Base):
+    __tablename__ = 'products'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(rules.MAX_PRODUCT_TITLE_LENGTH))
+    description: Mapped[str] = mapped_column(String(rules.MAX_PRODUCT_DESCRIPTION_LENGTH))
+    quantity: Mapped[int]
+    full_price: Mapped[int]
+    discount: Mapped[int] = mapped_column(default=0)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False),
+                                                 default=lambda: datetime.now(UTC).replace(tzinfo=None))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    images: Mapped[list[str]] = mapped_column(JSONB, default=list)
+
+    @hybrid_property
+    def final_price(self):
+        return int(self.full_price * (1 - self.discount / 100))
