@@ -6,7 +6,14 @@ from jose import JWTError, ExpiredSignatureError, jwt
 from src.config import settings
 from src.custom_exceptions import InvalidTokenError
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(
+    schemes=["argon2"],
+    deprecated="auto",
+    argon2__type="id",
+    argon2__rounds=2,
+    argon2__memory_cost=65536,
+    argon2__parallelism=4
+)
 
 
 def hash_pass(password: str):

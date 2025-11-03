@@ -1,6 +1,4 @@
-from typing import Annotated
-
-from fastapi import APIRouter, status, Depends, Query
+from fastapi import APIRouter, status, Depends
 
 from src.deps import ProductServiceDep
 from src.schemas.filtration import PaginationParams

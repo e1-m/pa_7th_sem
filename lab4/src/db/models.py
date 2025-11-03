@@ -18,7 +18,7 @@ class User(Base):
     __tablename__ = 'users'
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[Optional[str]] = mapped_column(String(rules.MAX_HASHED_PASSWORD_LENGTH), nullable=True)
+    password: Mapped[Optional[str]] = mapped_column(String(), nullable=True)
     name: Mapped[str] = mapped_column(String(rules.MAX_USERNAME_LENGTH))
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
 

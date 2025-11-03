@@ -20,7 +20,6 @@ class ProductIn(BaseModel):
 
 class ProductOut(BaseModel):
     id: int
-    rating: float
     final_price: int
     title: str
     description: str
