@@ -17,13 +17,6 @@ async def get_products(product_service: ProductServiceDep, pagination: Paginatio
     return await product_service.get_products(pagination=pagination, is_active=True)
 
 
-@router.get('/search', status_code=status.HTTP_200_OK, response_model=list[ProductOut])
-async def search_products(product_service: ProductServiceDep, q: str,
-                          categories: Annotated[list[int], Query(alias="category")] = None,
-                          pagination: PaginationParams = Depends()):
-    return await product_service.search_products(q, categories=categories, pagination=pagination)
-
-
 @router.get('/all', status_code=status.HTTP_200_OK, response_model=list[ProductOut])
 async def get_products_admin(product_service: ProductServiceDep,
                              pagination: PaginationParams = Depends(),

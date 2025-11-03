@@ -1,6 +1,4 @@
-from src.config import rules
 from src.crud import ProductCRUD
-from src.custom_exceptions import LimitExceededError, ResourceDoesNotExistError
 from src.db.models import Product
 from src.schemas.filtration import PaginationParams
 from src.schemas.product import ProductUpdate, ProductIn
@@ -12,11 +10,6 @@ class ProductService:
 
     async def get_products(self, pagination: PaginationParams = None, is_active: bool = None):
         return await self.product_crud.get_all(pagination=pagination, is_active=is_active)
-
-    async def search_products(self, q: str,
-                              categories: list[int] = None,
-                              pagination: PaginationParams = None):
-        return await self.product_crud.search(q, category_ids=categories, pagination=pagination)
 
     async def create_product(self, product: ProductIn):
         return await self.product_crud.create(Product(
