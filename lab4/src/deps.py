@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
-from aiohttp import ClientSession
 
 from src.crud import CartItemCRUD, ProductCRUD, OrderCRUD, RefreshTokenCRUD, RecoveryTokenCRUD
 from src.crud.users import UserCRUD
@@ -21,14 +20,6 @@ oauth2_schema = OAuth2PasswordBearer(tokenUrl="auth/login")
 TokenDep = Annotated[str, Depends(oauth2_schema)]
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
-
-
-async def get_http_client():
-    async with ClientSession() as session:
-        yield session
-
-
-HTTPClientDep = Annotated[ClientSession, Depends(get_http_client)]
 
 
 def get_cart_service(db: SessionDep):

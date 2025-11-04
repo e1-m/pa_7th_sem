@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.custom_exceptions import ResourceDoesNotExistError, ResourceAlreadyExistsError, DependentEntityExistsError
-from src.db.db import Base
+from src.db.models import Base
 from src.logger import logger
 from src.schemas.base import ObjUpdate
 from src.schemas.filtration import PaginationParams

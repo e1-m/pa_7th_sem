@@ -3,7 +3,8 @@ from typing import Optional
 from pydantic import BaseModel, Field, field_validator, field_serializer
 from pydantic_core.core_schema import ValidationInfo
 
-from src.config import settings, rules
+from src.config import settings
+from src.rules import rules
 from src.schemas.base import ObjUpdate
 
 

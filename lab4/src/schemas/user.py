@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, field_validator, Field
 
-from src.config import rules
+from src.rules import rules
 from src.utils import hash_pass
 
 

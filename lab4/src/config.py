@@ -3,14 +3,6 @@ from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Rules(BaseSettings):
-    MAX_USERNAME_LENGTH: int = 50
-    MIN_USERNAME_LENGTH: int = 3
-    MIN_PASSWORD_LENGTH: int = 8
-    MAX_PRODUCT_TITLE_LENGTH: int = 30
-    MAX_PRODUCT_DESCRIPTION_LENGTH: int = 1000
-
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='src/.env', env_file_encoding='utf-8')
 
@@ -28,4 +20,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-rules = Rules()

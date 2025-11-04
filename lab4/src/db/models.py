@@ -3,15 +3,19 @@ from typing import Optional
 
 from sqlalchemy import Integer, String, TIMESTAMP, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped, declared_attr
+from sqlalchemy.orm import Mapped, declared_attr, DeclarativeBase
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from src.config import rules
+from src.rules import rules
 from src.custom_types import OrderStatus
-from src.db.db import Base
 from src.schemas.item import Item
+
+
+class Base(AsyncAttrs, DeclarativeBase):
+    pass
 
 
 class User(Base):
