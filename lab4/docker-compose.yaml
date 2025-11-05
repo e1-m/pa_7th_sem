@@ -1,0 +1,27 @@
+name: patterns-lab4-5
+services:
+  api:
+    container_name: api
+    build:
+      dockerfile: docker/api/Dockerfile
+    environment:
+      POSTGRESQL_DB_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@patterns-lab4-db:5432/${POSTGRES_DB}
+      TOKEN_SECRET_KEY: ${TOKEN_SECRET_KEY}
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+  db:
+    image: postgres:17
+    container_name: patterns-lab4-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - patterns_lab4_db_data:/var/lib/postgresql/data
+
+volumes:
+  patterns_lab4_db_data:
